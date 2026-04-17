@@ -1,5 +1,5 @@
 {
-  "name": "capybara-catcher",
+  "name": "capicatcher",
   "private": true,
   "version": "0.0.0",
   "type": "module",
@@ -9,7 +9,7 @@
     "preview": "vite preview",
     "deploy": "npm run build && gh-pages -d dist"
   },
-  "homepage": "https://gsphome.github.io/capibara",
+  "homepage": "https://genilsuarez.github.io/capicatcher",
   "license": "MIT",
   "author": "Genil Suarez",
   "devDependencies": {

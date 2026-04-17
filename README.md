@@ -1,4 +1,4 @@
-# 🦫 Capybara Catcher Game
+# 🦫 CapiCatcher
 
 Un juego web divertido donde ayudas a un capibara hambriento a atrapar vegetales que caen del cielo.
 
