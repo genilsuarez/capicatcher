@@ -6,6 +6,7 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",
+    "build:full": "node scripts/deploy.js",
     "preview": "vite preview",
     "deploy": "npm run build && gh-pages -d dist"
   },
