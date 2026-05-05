@@ -139,7 +139,7 @@ export class CapybaraPlayer {
   }
 
   private updatePosition(): void {
-    this.element.style.left = `${this.x}px`;
+    this.element.style.transform = `translateX(${this.x}px)`;
     
     // Update direction based on movement
     const newDirection = this.x > this.lastX ? 'right' : this.x < this.lastX ? 'left' : this.direction;

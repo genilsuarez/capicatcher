@@ -76,9 +76,11 @@ body {
 .capybara-player {
   position: absolute;
   bottom: 20px;
+  left: 0;
   width: 100px;
   height: 75px;
   z-index: 10;
+  will-change: transform;
 }
 
 .capybara-player__body {
@@ -98,7 +100,6 @@ body {
   width: 100%;
   height: 100%;
   filter: drop-shadow(2px 2px 4px rgba(0,0,0,0.3));
-  transition: transform 0.1s ease;
   z-index: 2;
 }
 

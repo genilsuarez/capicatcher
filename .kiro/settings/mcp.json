@@ -9,7 +9,8 @@
       "autoApprove": [
         "browser_navigate",
         "browser_snapshot",
-        "browser_click"
+        "browser_click",
+        "browser_evaluate"
       ]
     }
   }
