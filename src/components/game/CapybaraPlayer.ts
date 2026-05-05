@@ -49,7 +49,7 @@ export class CapybaraPlayer {
       height: 0%;
       background: linear-gradient(45deg, #FF4500, #DC143C);
       border-radius: 50% 50% 40% 40%;
-      transition: height 0.3s ease, background 0.3s ease;
+      transition: height 0.15s ease-out, background 0.15s ease-out;
     `;
     
     body.appendChild(this.fillElement);
