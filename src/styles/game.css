@@ -126,9 +126,11 @@ body {
 /* Vegetables */
 .vegetable {
   position: absolute;
+  top: 0;
   width: 50px;
   height: 50px;
   z-index: 5;
+  will-change: transform;
   display: flex;
   align-items: center;
   justify-content: center;

@@ -7,6 +7,23 @@ export class VegetableSpawner {
   private readonly vegetableTypes = ['carrot', 'broccoli', 'lettuce', 'tomato', 'pepper'];
   private activeVegetables: Map<string, HTMLElement> = new Map();
 
+  // Pre-computed speed multipliers (avoid object creation per spawn)
+  private static readonly SPEED_MULTIPLIERS: Record<string, number> = {
+    lettuce: 0.8,
+    carrot: 1.0,
+    tomato: 1.1,
+    broccoli: 1.25,
+    pepper: 1.4
+  };
+
+  private static readonly POINTS: Record<string, number> = {
+    carrot: 5,
+    broccoli: 8,
+    lettuce: 3,
+    tomato: 6,
+    pepper: 10
+  };
+
   constructor(container: HTMLElement) {
     this.container = container;
   }
@@ -36,7 +53,7 @@ export class VegetableSpawner {
       x,
       y: -GameSettings.getVegetableSize(),
       speed: this.calculateVegetableSpeed(type, level),
-      points: this.getVegetablePoints(type)
+      points: VegetableSpawner.POINTS[type] || 5
     };
 
     this.createVegetableElement(vegetable);
@@ -47,7 +64,9 @@ export class VegetableSpawner {
     const element = document.createElement('div');
     element.className = `vegetable vegetable--${vegetable.type} vegetable--spawning`;
     element.style.left = `${vegetable.x}px`;
-    element.style.top = `${vegetable.y}px`;
+    element.style.transform = `translateY(${vegetable.y}px)`;
+    element.style.top = '0';
+    element.style.willChange = 'transform';
     element.id = vegetable.id;
     
     // Create SVG element
@@ -74,7 +93,7 @@ export class VegetableSpawner {
   public updateVegetablePosition(vegetable: Vegetable): void {
     const element = this.activeVegetables.get(vegetable.id);
     if (element) {
-      element.style.top = `${vegetable.y}px`;
+      element.style.transform = `translateY(${vegetable.y}px)`;
     }
   }
   
@@ -98,32 +117,10 @@ export class VegetableSpawner {
       this.activeVegetables.delete(id);
     }
   }
-
-  private getVegetablePoints(type: string): number {
-    const points: Record<string, number> = {
-      carrot: 5,
-      broccoli: 8,
-      lettuce: 3,
-      tomato: 6,
-      pepper: 10
-    };
-    return points[type] || 5;
-  }
   
   private calculateVegetableSpeed(type: string, level: number): number {
-    // Base speed increases with level
     const baseSpeed = 1.8 + (level * 0.25);
-    
-    // Speed multipliers based on points (risk vs reward)
-    const speedMultipliers: Record<string, number> = {
-      lettuce: 0.8,   // 3 pts - slowest (easy catch, low reward)
-      carrot: 1.0,    // 5 pts - normal speed
-      tomato: 1.1,    // 6 pts - slightly faster
-      broccoli: 1.25, // 8 pts - faster (harder catch, good reward)
-      pepper: 1.4     // 10 pts - fastest (hardest catch, best reward)
-    };
-    
-    const multiplier = speedMultipliers[type] || 1.0;
+    const multiplier = VegetableSpawner.SPEED_MULTIPLIERS[type] || 1.0;
     return baseSpeed * multiplier;
   }
 }

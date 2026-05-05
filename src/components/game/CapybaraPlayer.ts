@@ -11,16 +11,30 @@ export class CapybaraPlayer {
   private readonly speed: number = 8;
   private direction: 'left' | 'right' = 'right';
 
+  // Store bound handlers for cleanup
+  private keydownHandler: (e: KeyboardEvent) => void;
+  private mousemoveHandler: (e: MouseEvent) => void;
+  private touchstartHandler: (e: TouchEvent) => void;
+  private touchmoveHandler: (e: TouchEvent) => void;
+  private touchendHandler: () => void;
+  private isDragging = false;
+
   constructor(container: HTMLElement) {
     this.gameContainer = container;
     this.x = this.gameContainer.clientWidth / 2 - GameSettings.getCapybaraWidth() / 2;
     this.lastX = this.x;
+
+    // Bind handlers
+    this.keydownHandler = this.handleKeydown.bind(this);
+    this.mousemoveHandler = this.handleMousemove.bind(this);
+    this.touchstartHandler = this.handleTouchstart.bind(this);
+    this.touchmoveHandler = this.handleTouchmove.bind(this);
+    this.touchendHandler = this.handleTouchend.bind(this);
+
     this.createElement();
     container.appendChild(this.element);
     this.setupControls();
   }
-
-
 
   private createElement(): void {
     this.element = document.createElement('div');
@@ -59,72 +73,71 @@ export class CapybaraPlayer {
     this.updatePosition();
   }
 
-  private setupControls(): void {
-    document.addEventListener('keydown', (e) => {
-      if (gameState.gameStatus !== 'playing') return;
-      
-      switch(e.key) {
-        case 'ArrowLeft':
-        case 'a':
-        case 'A':
-          this.moveLeft();
-          break;
-        case 'ArrowRight':
-        case 'd':
-        case 'D':
-          this.moveRight();
-          break;
-      }
-    });
-
-    // Mouse controls
-    document.addEventListener('mousemove', (e) => {
-      if (gameState.gameStatus !== 'playing') return;
-      
-      const rect = this.gameContainer.getBoundingClientRect();
-      const relativeX = e.clientX - rect.left;
-      const capybaraWidth = GameSettings.getCapybaraWidth();
-      const offset = capybaraWidth / 2;
-      this.x = Math.max(0, Math.min(this.gameContainer.clientWidth - capybaraWidth, relativeX - offset));
-      this.updatePosition();
-    });
-
-    // Touch controls - LIMITED TO GAME CONTAINER ONLY
-    let isDragging = false;
+  private handleKeydown(e: KeyboardEvent): void {
+    if (gameState.gameStatus !== 'playing') return;
     
-    this.gameContainer.addEventListener('touchstart', (e) => {
-      // Only handle touches on the game area, not UI elements
-      const target = e.target as HTMLElement;
-      if (target.closest('.pause-overlay') || target.closest('.game-over') || target.closest('.level-transition') || target.closest('.audio-toggle')) {
-        return;
-      }
-      
-      isDragging = true;
-      e.preventDefault();
-    }, { passive: false });
+    switch(e.key) {
+      case 'ArrowLeft':
+      case 'a':
+      case 'A':
+        this.moveLeft();
+        break;
+      case 'ArrowRight':
+      case 'd':
+      case 'D':
+        this.moveRight();
+        break;
+    }
+  }
 
-    this.gameContainer.addEventListener('touchmove', (e) => {
-      if (!isDragging || gameState.gameStatus !== 'playing') return;
-      
-      // Only handle touches on the game area
-      const target = e.target as HTMLElement;
-      if (target.closest('.pause-overlay') || target.closest('.game-over') || target.closest('.level-transition') || target.closest('.audio-toggle')) {
-        return;
-      }
-      
-      const touch = e.touches[0];
-      const rect = this.gameContainer.getBoundingClientRect();
-      const relativeX = touch.clientX - rect.left;
-      const capybaraWidth = GameSettings.getCapybaraWidth();
-      const offset = capybaraWidth / 2;
-      this.x = Math.max(0, Math.min(this.gameContainer.clientWidth - capybaraWidth, relativeX - offset));
-      this.updatePosition();
-      e.preventDefault();
-    }, { passive: false });
+  private handleMousemove(e: MouseEvent): void {
+    if (gameState.gameStatus !== 'playing') return;
+    
+    const rect = this.gameContainer.getBoundingClientRect();
+    const relativeX = e.clientX - rect.left;
+    const capybaraWidth = GameSettings.getCapybaraWidth();
+    const offset = capybaraWidth / 2;
+    this.x = Math.max(0, Math.min(this.gameContainer.clientWidth - capybaraWidth, relativeX - offset));
+    this.updatePosition();
+  }
 
-    this.gameContainer.addEventListener('touchend', () => {
-      isDragging = false;
-    });
+  private handleTouchstart(e: TouchEvent): void {
+    const target = e.target as HTMLElement;
+    if (target.closest('.pause-overlay') || target.closest('.game-over') || target.closest('.level-transition') || target.closest('.audio-toggle')) {
+      return;
+    }
+    this.isDragging = true;
+    e.preventDefault();
+  }
+
+  private handleTouchmove(e: TouchEvent): void {
+    if (!this.isDragging || gameState.gameStatus !== 'playing') return;
+    
+    const target = e.target as HTMLElement;
+    if (target.closest('.pause-overlay') || target.closest('.game-over') || target.closest('.level-transition') || target.closest('.audio-toggle')) {
+      return;
+    }
+    
+    const touch = e.touches[0];
+    const rect = this.gameContainer.getBoundingClientRect();
+    const relativeX = touch.clientX - rect.left;
+    const capybaraWidth = GameSettings.getCapybaraWidth();
+    const offset = capybaraWidth / 2;
+    this.x = Math.max(0, Math.min(this.gameContainer.clientWidth - capybaraWidth, relativeX - offset));
+    this.updatePosition();
+    e.preventDefault();
+  }
+
+  private handleTouchend(): void {
+    this.isDragging = false;
+  }
+
+  private setupControls(): void {
+    document.addEventListener('keydown', this.keydownHandler);
+    document.addEventListener('mousemove', this.mousemoveHandler);
+    this.gameContainer.addEventListener('touchstart', this.touchstartHandler, { passive: false });
+    this.gameContainer.addEventListener('touchmove', this.touchmoveHandler, { passive: false });
+    this.gameContainer.addEventListener('touchend', this.touchendHandler);
   }
 
   private moveLeft(): void {
@@ -141,21 +154,22 @@ export class CapybaraPlayer {
   private updatePosition(): void {
     this.element.style.transform = `translateX(${this.x}px)`;
     
-    // Update direction based on movement
-    const newDirection = this.x > this.lastX ? 'right' : this.x < this.lastX ? 'left' : this.direction;
-    
-    if (newDirection !== this.direction) {
-      this.direction = newDirection;
-      const use = this.svgElement.querySelector('use');
-      if (use) {
-        use.setAttributeNS('http://www.w3.org/1999/xlink', 'xlink:href', `#capybara-${this.direction}`);
-      }
+    // Update direction based on movement (with threshold to avoid flicker)
+    if (Math.abs(this.x - this.lastX) > 1) {
+      const newDirection = this.x > this.lastX ? 'right' : 'left';
       
-      // Add running animation
-      this.element.classList.add('capybara-player--running');
-      setTimeout(() => {
-        this.element.classList.remove('capybara-player--running');
-      }, 300);
+      if (newDirection !== this.direction) {
+        this.direction = newDirection;
+        const use = this.svgElement.querySelector('use');
+        if (use) {
+          use.setAttributeNS('http://www.w3.org/1999/xlink', 'xlink:href', `#capybara-${this.direction}`);
+        }
+        
+        this.element.classList.add('capybara-player--running');
+        setTimeout(() => {
+          this.element.classList.remove('capybara-player--running');
+        }, 300);
+      }
     }
     
     this.lastX = this.x;
@@ -164,18 +178,13 @@ export class CapybaraPlayer {
   public updateFill(percentage: number): void {
     this.fillElement.style.height = `${percentage}%`;
     
-    // Energy color progression: Red (low) → Yellow (medium) → Green (high)
     if (percentage >= 80) {
-      // High energy: Bright green
       this.fillElement.style.background = 'linear-gradient(45deg, #32CD32, #228B22)';
     } else if (percentage >= 50) {
-      // Medium energy: Yellow/orange
       this.fillElement.style.background = 'linear-gradient(45deg, #FFD700, #FFA500)';
     } else if (percentage >= 20) {
-      // Low-medium energy: Orange/red-orange
       this.fillElement.style.background = 'linear-gradient(45deg, #FF8C00, #FF6347)';
     } else {
-      // Very low energy: Red
       this.fillElement.style.background = 'linear-gradient(45deg, #FF4500, #DC143C)';
     }
   }
@@ -189,6 +198,13 @@ export class CapybaraPlayer {
   }
 
   public destroy(): void {
+    // Remove all event listeners
+    document.removeEventListener('keydown', this.keydownHandler);
+    document.removeEventListener('mousemove', this.mousemoveHandler);
+    this.gameContainer.removeEventListener('touchstart', this.touchstartHandler);
+    this.gameContainer.removeEventListener('touchmove', this.touchmoveHandler);
+    this.gameContainer.removeEventListener('touchend', this.touchendHandler);
+
     if (this.element.parentNode) {
       this.element.parentNode.removeChild(this.element);
     }
