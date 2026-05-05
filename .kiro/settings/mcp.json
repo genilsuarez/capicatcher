@@ -10,7 +10,8 @@
         "browser_navigate",
         "browser_snapshot",
         "browser_click",
-        "browser_evaluate"
+        "browser_evaluate",
+        "browser_wait_for"
       ]
     }
   }

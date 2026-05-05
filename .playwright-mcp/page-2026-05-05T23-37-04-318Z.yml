@@ -1,0 +1,17 @@
+- generic [ref=e19]:
+  - generic [ref=e22]:
+    - button "⏸️" [ref=e23] [cursor=pointer]
+    - generic [ref=e24]:
+      - text: Score
+      - text: "0"
+    - generic [ref=e25]:
+      - text: Level
+      - text: "1"
+    - generic [ref=e26]: ❤️ ❤️ ❤️
+    - generic [ref=e27]: Energy
+    - button "🔊" [ref=e28] [cursor=pointer]:
+      - generic [ref=e29]: 🔊
+  - generic [ref=e2]:
+    - img [ref=e33]
+    - img [ref=e36]
+    - img [ref=e39]

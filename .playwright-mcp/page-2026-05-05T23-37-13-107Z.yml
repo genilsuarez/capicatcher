@@ -1,0 +1,20 @@
+- generic [ref=e19]:
+  - generic [ref=e22]:
+    - button "⏸️" [ref=e23] [cursor=pointer]
+    - generic [ref=e24]:
+      - text: Score
+      - text: "0"
+    - generic [ref=e25]:
+      - text: Level
+      - text: "1"
+    - generic [ref=e26]: 🤍 🤍 🤍
+    - generic [ref=e27]: Energy
+    - button "🔊" [ref=e28] [cursor=pointer]:
+      - generic [ref=e29]: 🔊
+  - generic [ref=e2]:
+    - img [ref=e33]
+    - generic [ref=e41]:
+      - heading "💔 Game Over 💔" [level=1] [ref=e42]
+      - generic [ref=e43]: "Too many vegetables missed! Final Score: 0 (Level 1)"
+      - button "Play Again" [ref=e44] [cursor=pointer]
+    - img [ref=e46]

@@ -1,0 +1,17 @@
+- generic [ref=e4]:
+  - heading "🦫 Capybara Catcher" [level=1] [ref=e5]
+  - paragraph [ref=e6]: Help the hungry capybara catch falling vegetables!
+  - generic [ref=e7]:
+    - paragraph [ref=e8]:
+      - strong [ref=e9]: "Controls:"
+      - text: Mouse/Keys/Touch
+    - paragraph [ref=e10]:
+      - strong [ref=e11]: "Goal:"
+      - text: Fill capybara to 100%
+    - paragraph [ref=e12]:
+      - strong [ref=e13]: "Warning:"
+      - text: Don't miss 3 vegetables!
+  - button "🥕 Vegetable Guide" [ref=e15] [cursor=pointer]
+  - button "🎮 Start Game" [ref=e16] [cursor=pointer]:
+    - generic [ref=e17]: 🎮
+    - generic [ref=e18]: Start Game
